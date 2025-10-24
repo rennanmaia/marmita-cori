@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Consulta de Cardápio do Dia</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; }
+        label, select, input { margin: 0.5em 0; display: block; }
+        #resultado { margin-top: 2em; }
+    </style>
+</head>
+<body>
+    <h1>Consultar Cardápio do Dia</h1>
+    <form id="consultaForm" onsubmit="return false;">
+        <label for="dataMenu">Data do Menu:</label>
+        <select id="dataMenu" required></select>
+
+        <label for="tipoUsuario">Tipo de Usuário:</label>
+        <select id="tipoUsuario" required></select>
+
+        <button type="button" onclick="consultarCardapio()">Consultar Cardápio</button>
+    </form>
+    <div id="resultado"></div>
+
+    <script>
+    // Carregar datas do menu
+    fetch('../api.php/menu')
+        .then(r => r.json())
+        .then(data => {
+            const select = document.getElementById('dataMenu');
+            data.forEach(menu => {
+                const opt = document.createElement('option');
+                opt.value = menu.id;
+                opt.textContent = menu.date;
+                select.appendChild(opt);
+            });
+        });
+
+    // Carregar tipos de usuário
+    fetch('../api.php/user_type')
+        .then(r => r.json())
+        .then(data => {
+            const select = document.getElementById('tipoUsuario');
+            data.forEach(tipo => {
+                const opt = document.createElement('option');
+                opt.value = tipo.id;
+                opt.textContent = tipo.name;
+                select.appendChild(opt);
+            });
+        });
+
+    function consultarCardapio() {
+        const menuId = document.getElementById('dataMenu').value;
+        const userTypeId = document.getElementById('tipoUsuario').value;
+        fetch(`../api.php/menu_option?menu_id=${menuId}&user_type_id=${userTypeId}`)
+            .then(r => r.json())
+            .then(data => {
+                const div = document.getElementById('resultado');
+                if (data.length === 0) {
+                    div.innerHTML = '<b>Nenhuma opção de cardápio encontrada para este dia e tipo de usuário.</b>';
+                } else {
+                    div.innerHTML = '<b>Opções de Cardápio:</b><ul>' +
+                        data.map(opt => `<li>${opt.description}</li>`).join('') + '</ul>';
+                }
+            });
+    }
+    </script>
+</body>
+</html>
