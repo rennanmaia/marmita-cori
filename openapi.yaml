@@ -1,0 +1,268 @@
+openapi: 3.0.3
+info:
+  title: API Controle de Entrega de Marmitas
+  version: 1.0.0
+  description: API REST para controle de entrega de marmitas em uma instituição.
+servers:
+  - url: http://localhost/marmita-cori/api.php
+paths:
+  /user_type:
+    get:
+      summary: Lista todos os tipos de usuário
+      responses:
+        '200':
+          description: Lista de tipos de usuário
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserType'
+    post:
+      summary: Cria um novo tipo de usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserTypeInput'
+      responses:
+        '201':
+          description: Tipo de usuário criado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+  /user:
+    get:
+      summary: Lista todos os usuários
+      responses:
+        '200':
+          description: Lista de usuários
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: Cria um novo usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+      responses:
+        '201':
+          description: Usuário criado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+  /menu:
+    get:
+      summary: Lista todas as datas de menu
+      responses:
+        '200':
+          description: Lista de menus
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Menu'
+    post:
+      summary: Cria uma nova data de menu
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MenuInput'
+      responses:
+        '201':
+          description: Menu criado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+  /menu_option:
+    get:
+      summary: Lista opções de cardápio
+      parameters:
+        - in: query
+          name: menu_id
+          schema:
+            type: integer
+          required: false
+          description: ID do menu (data)
+        - in: query
+          name: user_type_id
+          schema:
+            type: integer
+          required: false
+          description: ID do tipo de usuário
+      responses:
+        '200':
+          description: Lista de opções de cardápio
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MenuOption'
+    post:
+      summary: Cria uma nova opção de cardápio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MenuOptionInput'
+      responses:
+        '201':
+          description: Opção criada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+  /delivery:
+    get:
+      summary: Lista todas as entregas
+      responses:
+        '200':
+          description: Lista de entregas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Delivery'
+    post:
+      summary: Registra uma entrega
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeliveryInput'
+      responses:
+        '201':
+          description: Entrega registrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+components:
+  schemas:
+    UserType:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    UserTypeInput:
+      type: object
+      properties:
+        name:
+          type: string
+      required:
+        - name
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        user_type_id:
+          type: integer
+    UserInput:
+      type: object
+      properties:
+        name:
+          type: string
+        user_type_id:
+          type: integer
+      required:
+        - name
+        - user_type_id
+    Menu:
+      type: object
+      properties:
+        id:
+          type: integer
+        date:
+          type: string
+          format: date
+    MenuInput:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+      required:
+        - date
+    MenuOption:
+      type: object
+      properties:
+        id:
+          type: integer
+        menu_id:
+          type: integer
+        user_type_id:
+          type: integer
+        description:
+          type: string
+    MenuOptionInput:
+      type: object
+      properties:
+        menu_id:
+          type: integer
+        user_type_id:
+          type: integer
+        description:
+          type: string
+      required:
+        - menu_id
+        - user_type_id
+        - description
+    Delivery:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        menu_option_id:
+          type: integer
+        delivered_at:
+          type: string
+          format: date-time
+    DeliveryInput:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        menu_option_id:
+          type: integer
+      required:
+        - user_id
+        - menu_option_id
